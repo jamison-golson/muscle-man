@@ -1,0 +1,53 @@
+1. Grab UPC code from {cam image, 'file upload button', Full text search}
+    Error handle 
+        1. Make sure user uploads image OR proper string for full text search
+        2. 
+
+2. IF image, process barcode using pybarz js equivalent
+    Error handle: 
+        1. Check to make sure its an image
+        2. Check to make sure function returned proper UPC code
+        3. Handle error from packages neatly
+
+2b. IF string, pass string to openfood db
+    Error handling
+        1. Check to make sure user enters string
+        2. Check to make sure user selects ONE entry OR next page button
+
+    1. Hits openfood db API with full text search and returns top ten results {name, upc code}
+    2. User selects whick product is the correct one
+    3. If product is not found, return next ten results and repeat
+    4. Once product is found, send UPC code to openfood db
+
+3. Hit openfood database API for food breakdown using UPC code
+    Error handle:
+        1. make sure response is 200 and contents are returned properly
+        2. Handle errors from package neatly
+
+4. Store returned info in db
+    Error handle:
+        1. Confirm db is loaded 
+        2. Confirm data table exist
+        3. Check whether product exist in db, if not, store
+        4. Handle errors from package neatly
+    
+
+5. Visualize contents in db
+    Error handle:
+        1.Confirm necessary data is stored in local storage
+        2.
+
+    1. Show macros count/daily goal
+    2. Show nutrient breakdown of each food
+    3. Show food grade 
+    4. Show overall grade based on averages generated from food grades
+    5. Show top 'healthy' foods and 'non-healthy' foods
+    6. 
+
+
+Long term goals 
+    1. Authoriation/login handle and logic
+    2. Mobile app
+    3. Security
+    4. Reciepe and diet dbs 
+

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Tracker SPA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        #app {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1,
+        h2 {
+            color: #333;
+        }
+
+        #input-section,
+        #results-section,
+        #visualization-section {
+            margin-bottom: 20px;
+        }
+
+        #camera-input,
+        #file-upload,
+        #text-search {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <h1>Food Tracker</h1>
+        <div id="input-section">
+            <h2>Input Product</h2>
+            <div id="camera-input">
+                <!-- Camera input will go here -->
+            </div>
+            <div id="file-upload">
+                <!-- File upload input will go here -->
+            </div>
+            <div id="text-search">
+                <!-- Text search input will go here -->
+            </div>
+        </div>
+        <div id="results-section">
+            <!-- Results will be displayed here -->
+        </div>
+        <div id="visualization-section">
+            <!-- Data visualization will go here -->
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/sql-wasm.min.js"></script>
+    <script>
+        // File upload functionality
+        const fileUpload = document.createElement('input');
+        fileUpload.type = 'file';
+        fileUpload.accept = 'image/*';
+        fileUpload.id = 'file-upload-input';
+        document.getElementById('file-upload').appendChild(fileUpload);
+
+        fileUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                // Here we'll add code to process the image and extract the UPC
+                console.log('File uploaded:', file.name);
+            }
+        });
+
+        // Text search functionality
+        const textSearch = document.createElement('input');
+        textSearch.type = 'text';
+        textSearch.id = 'text-search-input';
+        textSearch.placeholder = 'Enter UPC code';
+        document.getElementById('text-search').appendChild(textSearch);
+
+        const searchButton = document.createElement('button');
+        searchButton.textContent = 'Search';
+        searchButton.id = 'text-search-button';
+        document.getElementById('text-search').appendChild(searchButton);
+
+        async function fetchProductData(upc) {
+            try {
+                const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${upc}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                // Extract and process the required fields
+                const processedData = {
+                    code: data.code || upc,
+                    product_name: data.product?.product_name || 'N/A',
+                    generic_name: data.product?.generic_name || 'N/A',
+                    brands: data.product?.brands || 'N/A',
+                    categories: data.product?.categories || 'N/A',
+                    ingredients: data.product?.ingredients_text || 'N/A',
+                    nutriments: data.product?.nutriments || 'N/A',
+                    image_front_url: data.product?.image_front_url || 'N/A',
+                    image_nutrition_url: data.product?.image_nutrition_url || 'N/A',
+                    ecoscore_grade: data.product?.ecoscore_grade || 'N/A',
+                    ecoscore_score: data.product?.ecoscore_score || 'N/A',
+                    nutriscore_grade: data.product?.nutriscore_grade || 'N/A',
+                    nutriscore_score: data.product?.nutriscore_score || 'N/A',
+                    states: data.product?.states || 'N/A'
+                };
+
+                return processedData;
+            } catch (error) {
+                console.error('Error fetching product data:', error);
+                throw error;
+            }
+        }
+
+        // Update the search button event listener
+        searchButton.addEventListener('click', async () => {
+            const upc = textSearch.value.trim();
+            if (upc) {
+                try {
+                    const productData = await fetchProductData(upc);
+                    displayResults(productData);
+                } catch (error) {
+                    console.error('Error fetching product data:', error);
+                    alert('An error occurred while fetching product data. Please try again.');
+                }
+            } else {
+                alert('Please enter a UPC code');
+            }
+        });
+
+        // Function to display results
+        function displayResults(productData) {
+            const resultsSection = document.getElementById('results-section');
+            resultsSection.innerHTML = '<h2>Product Data</h2>';
+
+            const table = document.createElement('table');
+            table.style.borderCollapse = 'collapse';
+            table.style.width = '100%';
+
+            for (const [key, value] of Object.entries(productData)) {
+                const row = table.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+
+                cell1.textContent = key;
+                cell2.textContent = typeof value === 'object' ? JSON.stringify(value) : value;
+
+                cell1.style.border = '1px solid black';
+                cell2.style.border = '1px solid black';
+                cell1.style.padding = '5px';
+                cell2.style.padding = '5px';
+            }
+
+            resultsSection.appendChild(table);
+        }
+
+        // Initialize SQLite database
+        let db;
+
+        initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}` }).then(function (SQL) {
+            db = new SQL.Database();
+            console.log('SQLite database initialized');
+            // Here we'll create necessary tables
+        }).catch(err => console.error(err));
+    </script>
+</body>
+
+</html>
