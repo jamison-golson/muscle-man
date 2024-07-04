@@ -1,0 +1,99 @@
+#UPC image folder
+upc/
+
+#test files
+app.ipynb
+
+# Node modules
+node_modules/
+
+# Dependency folders
+dependencies/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+
+# Build files
+dist/
+build/
+
+# Editor files
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+
+# Unit test coverage directory
+coverage/
+
+# Node generated files
+package-lock.json
+
+# IDE specific files
+*.sublime-*
+
+# Mac specific files
+*.swp
+
+# Linux specific files
+*.swo
+
+# Windows specific files
+Thumbs.db
+desktop.ini
+
+# npm-debug.log files
+npm-debug.log
+
+# Yarn integrity file
+.yarn-integrity
+
+# Firebase Security Rules file
+database.rules.json
+
+# Gatsby files
+.cache/
+public/
+
+# next.js files
+.next/
+
+# Nuxt.js files
+.nuxt
+
+# test files
+test/
+
+# Dist files
+dist/
+
+# Lint cache
+.eslintcache
+
+# End of file
+**/*~
+
+# IDE format configuration
+.idea/
+
+# yeoman cache
+.yo
+
+# Environment file
+.env
+
+# .vscode files
+.vscode/
+
+.nyc_output/
+
+.nyc_output/
+
+.vs/
+
+.history/
