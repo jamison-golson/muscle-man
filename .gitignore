@@ -3,6 +3,8 @@ upc/
 
 #test files
 app.ipynb
+resources.txt
+obj.txt
 
 
 # Node modules
