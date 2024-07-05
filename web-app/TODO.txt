@@ -37,6 +37,7 @@
             "ecoscore_score": null,
             "nutriscore_grade": null,
             "nutriscore_score": null,
+            "nutrient_levels": null,
             "states": null 
         
 
