@@ -1,8 +1,10 @@
 #UPC image folder
 upc/
 
-#test files
+# Ignore Jupyter Notebook files
 app.ipynb
+
+# Ignore text files
 resources.txt
 obj.txt
 
