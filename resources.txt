@@ -1,2 +1,0 @@
-#Article explaining what a nutriscore is and how it is used
-https://world.openfoodfacts.org/nutriscore

@@ -1,6 +1,0 @@
-This project is a POC that shows anybody can track their nutritiion for free.
-The project aims to impower anybody, willing to put in the time, to drastically change their lifestyle for the better
-The project relies on opensource projects like SQL and openfoodfactsdb for information retrieval and data storage
-The project relies on AI to power its thought processes
-
-
