@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Tracker SPA</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -39,6 +40,29 @@
         #text-search {
             margin-bottom: 10px;
         }
+
+        #nutrition-label {
+            border: 2px solid #333;
+            padding: 10px;
+            width: 300px;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .nutrition-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ccc;
+            padding: 5px 0;
+        }
+
+        .nutrition-row:hover {
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+
+        #nutrient-details {
+            margin-top: 20px;
+        }
     </style>
 </head>
 
@@ -60,8 +84,14 @@
         <div id="results-section">
             <!-- Results will be displayed here -->
         </div>
+        <div id="nutrition-label">
+            <!-- Interactive Digital Nutrition Label will be displayed here -->
+        </div>
+        <div id="nutrient-details">
+            <!-- Detailed nutrient information will be displayed here -->
+        </div>
         <div id="visualization-section">
-            <!-- Data visualization will go here -->
+            <canvas id="myChart"></canvas>
         </div>
         <div id="history-section">
             <!-- Search history will be displayed here -->
@@ -196,27 +226,111 @@
         // Function to display results
         function displayResults(productData) {
             const resultsSection = document.getElementById('results-section');
-            resultsSection.innerHTML = '<h2>Product Data</h2>';
+            resultsSection.innerHTML = `<h2>${productData.product_name}</h2>`;
 
-            const table = document.createElement('table');
-            table.style.borderCollapse = 'collapse';
-            table.style.width = '100%';
-
-            for (const [key, value] of Object.entries(productData)) {
-                const row = table.insertRow();
-                const cell1 = row.insertCell(0);
-                const cell2 = row.insertCell(1);
-
-                cell1.textContent = key;
-                cell2.textContent = typeof value === 'object' ? JSON.stringify(value) : value;
-
-                cell1.style.border = '1px solid black';
-                cell2.style.border = '1px solid black';
-                cell1.style.padding = '5px';
-                cell2.style.padding = '5px';
+            if (productData.image_front_url !== 'N/A') {
+                const img = document.createElement('img');
+                img.src = productData.image_front_url;
+                img.alt = productData.product_name;
+                img.style.maxWidth = '200px';
+                resultsSection.appendChild(img);
             }
 
-            resultsSection.appendChild(table);
+            createNutritionLabel(productData);
+        }
+
+        let currentChart;
+
+        function createNutritionLabel(productData) {
+            const labelContainer = document.getElementById('nutrition-label');
+            labelContainer.innerHTML = '<h3>Nutrition Facts</h3>';
+
+            const nutrients = [
+                { name: 'Energy', value: productData.nutriments['energy-kcal_100g'], unit: 'kcal' },
+                { name: 'Fat', value: productData.nutriments['fat_100g'], unit: 'g' },
+                { name: 'Saturated Fat', value: productData.nutriments['saturated-fat_100g'], unit: 'g' },
+                { name: 'Carbohydrates', value: productData.nutriments['carbohydrates_100g'], unit: 'g' },
+                { name: 'Sugars', value: productData.nutriments['sugars_100g'], unit: 'g' },
+                { name: 'Fiber', value: productData.nutriments['fiber_100g'], unit: 'g' },
+                { name: 'Proteins', value: productData.nutriments['proteins_100g'], unit: 'g' },
+                { name: 'Salt', value: productData.nutriments['salt_100g'], unit: 'g' },
+            ];
+
+            nutrients.forEach(nutrient => {
+                const row = document.createElement('div');
+                row.className = 'nutrition-row';
+                row.innerHTML = `<span>${nutrient.name}</span><span>${nutrient.value || 'N/A'} ${nutrient.unit}</span>`;
+                row.addEventListener('click', () => showNutrientDetails(nutrient, productData));
+                labelContainer.appendChild(row);
+            });
+
+            // Add Nutri-Score and Eco-Score
+            const scoreRow = document.createElement('div');
+            scoreRow.className = 'nutrition-row';
+            scoreRow.innerHTML = `
+        <span>Nutri-Score: ${productData.nutriscore_grade || 'N/A'}</span>
+        <span>Eco-Score: ${productData.ecoscore_grade || 'N/A'}</span>
+    `;
+            labelContainer.appendChild(scoreRow);
+        }
+
+        function showNutrientDetails(nutrient, productData) {
+            const detailsContainer = document.getElementById('nutrient-details');
+            detailsContainer.innerHTML = `<h3>${nutrient.name} Details</h3>`;
+
+            // Create a canvas for the Chart.js chart
+            // const canvas = document.createElement('canvas');
+            // canvas.id = 'nutrientChart';
+            // detailsContainer.appendChild(canvas);
+
+            //Grab the canvas from HTML
+            const canvas = document.getElementById('myChart')
+
+            // Destroy the existing chart instance if it exists
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            // Calculate percentage of daily value (assuming a 2000 calorie diet)
+            const dailyValues = {
+                'Energy': 2000,
+                'Fat': 65,
+                'Saturated Fat': 20,
+                'Carbohydrates': 300,
+                'Sugars': 50,
+                'Fiber': 25,
+                'Proteins': 50,
+                'Salt': 6
+            };
+
+            const value = parseFloat(nutrient.value) || 0;
+            const percentageOfDV = (nutrient.value / dailyValues[nutrient.name]) * 100;
+
+            // Create the chart
+            currentChart = new Chart(canvas, {
+                type: 'doughnut',
+                data: {
+                    labels: [`${nutrient.name} (${percentageOfDV.toFixed(1)}% of DV)`, 'Remaining'],
+                    datasets: [{
+                        data: [percentageOfDV, Math.max(0, 100 - percentageOfDV)],
+                        backgroundColor: ['#FF6384', '#36A2EB']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    title: {
+                        display: true,
+                        text: `${nutrient.name} as Percentage of Daily Value`
+                    }
+                }
+            });
+
+            // Add more details or comparisons here
+            detailsContainer.innerHTML += `
+                <p>Amount per 100g: ${value.toFixed(2)} ${nutrient.unit}</p>
+                <p>Percentage of Daily Value: ${percentageOfDV.toFixed(1)}%</p>
+            `;
         }
 
         // Initialize SQLite database
