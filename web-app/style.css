@@ -1,0 +1,56 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+#app {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1,
+h2 {
+    color: #333;
+}
+
+#input-section,
+#results-section,
+#visualization-section {
+    margin-bottom: 20px;
+}
+
+#camera-input,
+#file-upload,
+#text-search {
+    margin-bottom: 10px;
+}
+
+#nutrition-label {
+    border: 2px solid #333;
+    padding: 10px;
+    width: 300px;
+    font-family: 'Arial', sans-serif;
+}
+
+.nutrition-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #ccc;
+    padding: 5px 0;
+}
+
+.nutrition-row:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+#nutrient-details {
+    margin-top: 20px;
+}
