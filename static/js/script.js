@@ -46,12 +46,13 @@ function clearFileInput(input) {
 }
 
 
-
+//A function that accepts a image and returns the the upc extracted from the image
 async function fetchUpcFromImage(imageFile) {
     try {
         const formData = new FormData();
         formData.append('image', imageFile);
 
+        //Sends a POST request to the server, the request contains a image
         const response = await fetch('/fetch_upc_from_image', {
             method: 'POST',
             body: formData,

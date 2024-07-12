@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Tracker SPA</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- The double brackets is used by flask. It allows for variables to be passed to html elements
+     The url_for() is function from flask. It creates a dynamic url for the style sheet to be loaded by the backend-->
+     <!-- https://www.geeksforgeeks.org/flask-url-helper-function-flask-url_for/-->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
