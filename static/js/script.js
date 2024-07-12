@@ -10,13 +10,64 @@ fileUpload.accept = 'image/*';
 fileUpload.id = 'file-upload-input';
 document.getElementById('file-upload').appendChild(fileUpload);
 
-fileUpload.addEventListener('change', (event) => {
+fileUpload.addEventListener('change', async (event) => {
     const file = event.target.files[0];
+    console.log(event.target.files)
     if (file) {
-        // Here we'll add code to process the image and extract the UPC
-        console.log('File uploaded:', file.name);
+        try {
+            const upc = await fetchUpcFromImage(file);
+            console.log('UPC:', upc);
+            const productData = await fetchProductData(upc);
+            displayResults(productData);
+            saveToLocalStorage(productData);
+        } catch (error) {
+            console.error('Error processing image or fetching product data:', error);
+            alert('An error occurred while processing the image or fetching product data. Please try again.');
+        } finally {
+            // Clear the file input to allow uploading the same file again
+            clearFileInput(fileUpload);
+        }
+    } else {
+        alert('Please upload an image');
     }
 });
+
+// Function to clear the file input
+// This is temporary, will be replaced with sum button functionality 
+function clearFileInput(input) {
+    // Clear the file input value
+    input.value = '';
+    
+    // For IE/Edge, we need to clear the value in a different way
+    if (input.value) {
+        input.type = 'text';
+        input.type = 'file';
+    }
+}
+
+
+
+async function fetchUpcFromImage(imageFile) {
+    try {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+
+        const response = await fetch('/fetch_upc_from_image', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.upc; // Return the UPC directly
+    } catch (error) {
+        console.error('Error fetching product data:', error);
+        throw error;
+    }
+}
 
 // Text search functionality
 const textSearch = document.createElement('input');
@@ -32,43 +83,23 @@ document.getElementById('text-search').appendChild(searchButton);
 
 async function fetchProductData(upc) {
     try {
-        const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${upc}`);
+        const response = await fetch('/fetch_product_data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ upc: upc }),
+        });
         if (!response.ok) {
-
-            //This gave me a notification instead of printing the error message to the output
-            const resultsSection = document.getElementById('results-section');
-            resultsSection.textContent = response.statusText
             throw new Error(`HTTP error! status: ${response.status}`);
-
-            //Print the error message for the user: 404 means 'not found'
         }
-        const data = await response.json();
 
-        // Extract and process the required fields
-        const processedData = {
-            code: data.code || upc,
-            product_name: data.product?.product_name || 'N/A',
-            generic_name: data.product?.generic_name || 'N/A',
-            brands: data.product?.brands || 'N/A',
-            categories: data.product?.categories || 'N/A',
-            ingredients: data.product?.ingredients_text || 'N/A',
-            nutriments: data.product?.nutriments || 'N/A',
-            image_front_url: data.product?.image_front_url || 'N/A',
-            image_nutrition_url: data.product?.image_nutrition_url || 'N/A',
-            ecoscore_grade: data.product?.ecoscore_grade || 'N/A',
-            ecoscore_score: data.product?.ecoscore_score || 'N/A',
-            nutriscore_grade: data.product?.nutriscore_grade || 'N/A',
-            nutriscore_score: data.product?.nutriscore_score || 'N/A',
-            states: data.product?.states || 'N/A'
-        };
-
-        return processedData;
+        return await response.json();
     } catch (error) {
         console.error('Error fetching product data:', error);
         throw error;
     }
 }
-
 // Function to save data to local storage
 function saveToLocalStorage(data) {
     let history = JSON.parse(localStorage.getItem('productHistory')) || [];
@@ -238,10 +269,10 @@ function showNutrientDetails(nutrient, productData) {
 }
 
 // Initialize SQLite database
-let db;
+// let db;
 
-initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}` }).then(function (SQL) {
-    db = new SQL.Database();
-    console.log('SQLite database initialized');
-    // Here we'll create necessary tables
-}).catch(err => console.error(err));
+// initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}` }).then(function (SQL) {
+//     db = new SQL.Database();
+//     console.log('SQLite database initialized');
+//     // Here we'll create necessary tables
+// }).catch(err => console.error(err));

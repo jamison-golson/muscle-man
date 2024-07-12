@@ -1,5 +1,6 @@
 #UPC image folder
 upc/
+uploads/
 
 # Ignore Jupyter Notebook files
 app.ipynb
@@ -8,6 +9,9 @@ app.ipynb
 resources.txt
 obj.txt
 ideas_thoughts.txt
+
+# Ignore venv
+venv/
 
 # Ignore data
 data/
