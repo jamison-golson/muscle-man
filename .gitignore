@@ -2,6 +2,9 @@
 upc/
 uploads/
 
+#papers
+papers/
+
 # Ignore Jupyter Notebook files
 app.ipynb
 
@@ -9,6 +12,7 @@ app.ipynb
 resources.txt
 obj.txt
 ideas_thoughts.txt
+openfooddb_api.txt
 
 # Ignore venv
 venv/
